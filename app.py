@@ -18,7 +18,7 @@ def load_model():
 
 model = load_model()
 
-# ── Styling ──────────────────────────────────────────────────────────────────
+#styling
 st.markdown("""
 <style>
     .main { background-color: #f8fafc; }
@@ -79,10 +79,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── Header ───────────────────────────────────────────────────────────────────
+# header
 st.markdown("""
 <div class="header-box">
-    <h1>📱 Prepaid → Postpaid Migration Predictor</h1>
+    <h1> fadhlan demo Prepaid  Postpaid Migration Predictor</h1>
     <p>Enter customer profile details to predict likelihood of migrating to a postpaid plan.</p>
 </div>
 """, unsafe_allow_html=True)
@@ -105,7 +105,7 @@ left, right = st.columns([2, 1], gap="large")
 
 with left:
     # Demographics
-    st.markdown('<div class="section-label">👤 Demographics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> Demographics</div>', unsafe_allow_html=True)
     d1, d2, d3 = st.columns(3)
     with d1:
         age = st.number_input("Age", min_value=18, max_value=80, value=30)
@@ -115,7 +115,7 @@ with left:
         region = st.selectbox("Region", ["Central", "Northern", "Southern", "Eastern", "Sabah/Sarawak"])
 
     # Top-up History
-    st.markdown('<div class="section-label">💳 Top-Up History</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> Top-Up History</div>', unsafe_allow_html=True)
     t1, t2, t3 = st.columns(3)
     with t1:
         topup_frequency = st.number_input("Top-up Frequency (per month)", min_value=0, max_value=30, value=4)
@@ -125,7 +125,7 @@ with left:
         topup_regularity = st.slider("Top-up Regularity Score", 0.0, 1.0, 0.5, help="0 = irregular, 1 = very regular")
 
     # Voice Usage
-    st.markdown('<div class="section-label">📞 Voice Usage</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> Voice Usage</div>', unsafe_allow_html=True)
     v1, v2 = st.columns(2)
     with v1:
         outgoing_mins = st.number_input("Outgoing Call Minutes/month", min_value=0.0, max_value=1000.0, value=120.0)
@@ -133,7 +133,7 @@ with left:
         incoming_mins = st.number_input("Incoming Call Minutes/month", min_value=0.0, max_value=1000.0, value=100.0)
 
     # Data & SMS
-    st.markdown('<div class="section-label">📶 Data & SMS Activity</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> Data & SMS Activity</div>', unsafe_allow_html=True)
     ds1, ds2 = st.columns(2)
     with ds1:
         data_usage_mb = st.number_input("Data Usage (MB/month)", min_value=0.0, max_value=20000.0, value=2000.0)
@@ -141,7 +141,7 @@ with left:
         sms_frequency = st.number_input("SMS Sent (per month)", min_value=0, max_value=500, value=30)
 
     # USSD & Roaming
-    st.markdown('<div class="section-label">🌐 USSD & Roaming</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> USSD & Roaming</div>', unsafe_allow_html=True)
     u1, u2 = st.columns(2)
     with u1:
         ussd_queries = st.number_input("USSD Queries (per month)", min_value=0, max_value=100, value=5)
@@ -153,7 +153,7 @@ with left:
 
 # ── Prediction Output ─────────────────────────────────────────────────────────
 with right:
-    st.markdown('<div class="section-label">📊 Prediction Result</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label"> Prediction Result</div>', unsafe_allow_html=True)
 
     if predict_btn:
         roam_val = 1 if has_roamed == "Yes" else 0
@@ -177,7 +177,7 @@ with right:
         pct = round(prob * 100, 1)
 
         if pred == 1:
-            st.success("✅ Likely to Migrate to Postpaid")
+            st.success(" Likely to Migrate to Postpaid")
             st.metric(label="Migration Likelihood", value=f"{pct}%")
 
             insights = []
@@ -191,12 +191,12 @@ with right:
                 insights.append("Roaming history suggests need for better international coverage.")
 
             if insights:
-                st.markdown("**💡 Key Signals:**")
+                st.markdown("** Key Signals:**")
                 for i in insights:
                     st.markdown(f"• {i}")
 
         else:
-            st.warning("⚠️ Unlikely to Migrate to Postpaid")
+            st.warning(" Unlikely to Migrate to Postpaid")
             st.metric(label="Migration Likelihood", value=f"{pct}%")
 
             insights = []
