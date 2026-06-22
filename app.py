@@ -18,7 +18,7 @@ def load_model():
 
 model = load_model()
 
-# styling
+# ── Styling ──────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
     .main { background-color: #f8fafc; }
@@ -43,24 +43,6 @@ st.markdown("""
         margin-bottom: 0.6rem;
         margin-top: 1.2rem;
     }
-
-    .result-migrate {
-        background: linear-gradient(135deg, #065f46, #047857);
-        color: white;
-        padding: 1.8rem 2rem;
-        border-radius: 12px;
-        text-align: center;
-    }
-    .result-stay {
-        background: linear-gradient(135deg, #7c2d12, #b45309);
-        color: white;
-        padding: 1.8rem 2rem;
-        border-radius: 12px;
-        text-align: center;
-    }
-    .result-label { font-size: 1rem; opacity: 0.85; }
-    .result-value { font-size: 2.4rem; font-weight: 800; margin: 0.3rem 0; }
-    .result-sub   { font-size: 0.85rem; opacity: 0.75; }
 
     .metric-card {
         background: white;
@@ -97,15 +79,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-#header
+# ── Header ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="header-box">
-    <h1> Fadhlan demo interview Prepaid → Postpaid Migration Predictor</h1>
+    <h1>📱 Prepaid → Postpaid Migration Predictor</h1>
     <p>Enter customer profile details to predict likelihood of migrating to a postpaid plan.</p>
 </div>
 """, unsafe_allow_html=True)
 
-#model metrics
+# ── Model metrics (top) ───────────────────────────────────────────────────────
 c1, c2, c3, c4 = st.columns(4)
 with c1:
     st.markdown('<div class="metric-card"><div class="val">80%</div><div class="lbl">Model Accuracy</div></div>', unsafe_allow_html=True)
@@ -118,7 +100,7 @@ with c4:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# input
+# ── Input Form ────────────────────────────────────────────────────────────────
 left, right = st.columns([2, 1], gap="large")
 
 with left:
@@ -143,7 +125,7 @@ with left:
         topup_regularity = st.slider("Top-up Regularity Score", 0.0, 1.0, 0.5, help="0 = irregular, 1 = very regular")
 
     # Voice Usage
-    st.markdown('<div class="section-label"> Voice Usage</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">📞 Voice Usage</div>', unsafe_allow_html=True)
     v1, v2 = st.columns(2)
     with v1:
         outgoing_mins = st.number_input("Outgoing Call Minutes/month", min_value=0.0, max_value=1000.0, value=120.0)
@@ -151,7 +133,7 @@ with left:
         incoming_mins = st.number_input("Incoming Call Minutes/month", min_value=0.0, max_value=1000.0, value=100.0)
 
     # Data & SMS
-    st.markdown('<div class="section-label"> Data & SMS Activity</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">📶 Data & SMS Activity</div>', unsafe_allow_html=True)
     ds1, ds2 = st.columns(2)
     with ds1:
         data_usage_mb = st.number_input("Data Usage (MB/month)", min_value=0.0, max_value=20000.0, value=2000.0)
@@ -159,7 +141,7 @@ with left:
         sms_frequency = st.number_input("SMS Sent (per month)", min_value=0, max_value=500, value=30)
 
     # USSD & Roaming
-    st.markdown('<div class="section-label">USSD & Roaming</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">🌐 USSD & Roaming</div>', unsafe_allow_html=True)
     u1, u2 = st.columns(2)
     with u1:
         ussd_queries = st.number_input("USSD Queries (per month)", min_value=0, max_value=100, value=5)
@@ -169,12 +151,11 @@ with left:
     st.markdown("<br>", unsafe_allow_html=True)
     predict_btn = st.button("🔍 Predict Migration Likelihood")
 
-# prediction output 
+# ── Prediction Output ─────────────────────────────────────────────────────────
 with right:
-    st.markdown('<div class="section-label"> Prediction Result</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">📊 Prediction Result</div>', unsafe_allow_html=True)
 
     if predict_btn:
-        # Encode inputs
         roam_val = 1 if has_roamed == "Yes" else 0
         regions = ['Central', 'Eastern', 'Northern', 'Sabah/Sarawak', 'Southern']
         region_encoded = [1 if region == r else 0 for r in regions]
@@ -191,19 +172,14 @@ with right:
         ]])
 
         prob = model.predict_proba(features)[0][1]
-        pred = model.predict(features)[0]
-        pct  = round(prob * 100, 1)
+        threshold = 0.65  # tuned threshold — above 65% = likely to migrate
+        pred = 1 if prob >= threshold else 0
+        pct = round(prob * 100, 1)
 
         if pred == 1:
-            st.markdown(f"""
-            <div class="result-migrate">
-                <div class="result-label">Migration Likelihood</div>
-                <div class="result-value">{pct}%</div>
-                <div class="result-sub"> Likely to Migrate to Postpaid</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.success("✅ Likely to Migrate to Postpaid")
+            st.metric(label="Migration Likelihood", value=f"{pct}%")
 
-            # Insight
             insights = []
             if data_usage_mb > 3000:
                 insights.append("High data consumption suggests postpaid unlimited plans would be attractive.")
@@ -215,16 +191,13 @@ with right:
                 insights.append("Roaming history suggests need for better international coverage.")
 
             if insights:
-                st.markdown(f'<div class="insight-box"> <b>Key Signals:</b><br>{"<br>".join(f"• {i}" for i in insights)}</div>', unsafe_allow_html=True)
+                st.markdown("**💡 Key Signals:**")
+                for i in insights:
+                    st.markdown(f"• {i}")
 
         else:
-            st.markdown(f"""
-            <div class="result-stay">
-                <div class="result-label">Migration Likelihood</div>
-                <div class="result-value">{pct}%</div>
-                <div class="result-sub"> Unlikely to Migrate to Postpaid</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.warning("⚠️ Unlikely to Migrate to Postpaid")
+            st.metric(label="Migration Likelihood", value=f"{pct}%")
 
             insights = []
             if data_usage_mb < 500:
@@ -235,26 +208,27 @@ with right:
                 insights.append("Short tenure — customer may still be evaluating the service.")
 
             if insights:
-                st.markdown(f'<div class="insight-box"> <b>Key Signals:</b><br>{"<br>".join(f"• {i}" for i in insights)}</div>', unsafe_allow_html=True)
+                st.markdown("**💡 Key Signals:**")
+                for i in insights:
+                    st.markdown(f"• {i}")
 
-        # Probability bar
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("**Confidence Score**")
         st.progress(prob)
-        st.caption(f"Model is {pct}% confident this customer will migrate.")
+        st.caption(f"Model is {pct}% confident this customer will migrate. Threshold set at 65%.")
 
     else:
         st.info("Fill in the customer details on the left and click **Predict** to see the result.")
-
         st.markdown("""
         <div class="insight-box">
         <b>How to use:</b><br>
         • Fill in the customer's demographic and behavioral data<br>
         • Click Predict to get migration likelihood<br>
+        • Score above 65% = likely to migrate<br>
         • Use the result to prioritize outreach campaigns
         </div>
         """, unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
-st.caption("Demo version · Built with XGBoost · Trained on synthetic data reflecting real feature engineering")
+st.caption("Demo version · Built with XGBoost · Threshold tuned at 65% · Trained on synthetic data reflecting real feature engineering")
